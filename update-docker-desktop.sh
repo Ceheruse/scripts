@@ -14,8 +14,22 @@ fi
 
 # Fonction pour récupérer la dernière version depuis le site officiel
 get_latest_version() {
-    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/$arch/appcast.xml | grep -oPm1 "(?<=sparkle:shortVersionString=\")[^\"]+")
+    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/$arch/appcast.xml | grep -oP "(?<=sparkle:shortVersionString=\")[^\"]+" | sort -V | tail -n 1)
     echo "$LATEST_VERSION"
+}
+
+# Fonction pour récupérer l'url de téléchargement avec la version en paramètre
+get_download_url() {
+    local latest_version="$1"
+    local xml_url="https://desktop.docker.com/linux/main/amd64/appcast.xml"
+    local DOWNLOAD_URL
+
+    DOWNLOAD_URL=$(curl -sL "$xml_url" | \
+        grep "<enclosure " | \
+        grep "sparkle:shortVersionString=\"$latest_version\"" | \
+        grep -oP 'url="\K[^"]+')
+
+    echo "$DOWNLOAD_URL"
 }
 
 # Fonction pour récupérer la version installée
@@ -76,7 +90,16 @@ mkdir -p "$tmp_dir"
 cd "$tmp_dir"
 
 # deb_url="https://desktop.docker.com/linux/main/${arch}/docker-desktop-${latest_version}-amd64.deb"
-deb_url="https://desktop.docker.com/linux/main/${arch}/docker-desktop-${arch}.deb"
+# deb_url="https://desktop.docker.com/linux/main/${arch}/docker-desktop-${arch}.deb"
+deb_url=$(get_download_url "$latest_version")
+
+if [[ -z "$deb_url" ]]; then
+    echo "❌ Impossible de récupérer l'URL de téléchargement."
+    exit 1
+fi
+
+echo "🔗 URL de téléchargement : $deb_url"
+
 deb_file="docker-desktop-${latest_version}.deb"
 
 echo "📥 Téléchargement de la version $latest_version..."
