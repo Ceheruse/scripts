@@ -14,7 +14,7 @@ fi
 
 # Fonction pour récupérer la dernière version depuis le site officiel
 get_latest_version() {
-    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/$arch/appcast.xml | grep -oP "(?<=sparkle:shortVersionString=\")[^\"]+" | sort -V | tail -n 1)
+    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/amd64/appcast.xml | grep -oP "(?<=sparkle:shortVersionString=\")[^\"]+" | sort -V | tail -n 1)
     echo "$LATEST_VERSION"
 }
 
