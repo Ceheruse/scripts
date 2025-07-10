@@ -15,7 +15,7 @@ fi
 # Fonction pour récupérer l'url de téléchargement avec la version en paramètre
 get_download_url() {
     local latest_version="$1"
-    local xml_url="https://desktop.docker.com/linux/main/amd64/appcast.xml"
+    local xml_url="https://desktop.docker.com/linux/main/$arch/appcast.xml"
     local DOWNLOAD_URL
 
     DOWNLOAD_URL=$(curl -sL "$xml_url" | \
@@ -28,7 +28,7 @@ get_download_url() {
 
 # Fonction pour récupérer la dernière version depuis le site officiel
 get_latest_version() {
-    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/amd64/appcast.xml | grep -oP "(?<=sparkle:shortVersionString=\")[^\"]+" | sort -V | tail -n 1)
+    local LATEST_VERSION=$(curl -sL https://desktop.docker.com/linux/main/$arch/appcast.xml | grep -oP "(?<=sparkle:shortVersionString=\")[^\"]+" | sort -V | tail -n 1)
     echo "$LATEST_VERSION"
 }
 
